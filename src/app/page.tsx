@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import TestButton from "@/components/ui/test";
 import { ThemeSwitcher } from "@/components/ui/themeSwitcher";
 
 export default function Home() {
@@ -7,7 +6,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <ThemeSwitcher />
       <Button variant={"default"} size={"sm"}>
-        Click me
+        Click
       </Button>
       <Button variant={"warning"} size={"md"}>
         Click me
@@ -18,7 +17,6 @@ export default function Home() {
       <Button variant={"destructive"} size={"xl"}>
         Click me
       </Button>
-      <TestButton>Click me</TestButton>
     </main>
   );
 }
