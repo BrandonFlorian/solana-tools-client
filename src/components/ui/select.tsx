@@ -51,7 +51,7 @@ const selectItemVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 focus:text-primary-foreground dark:focus:bg-primary/90 dark:focus:text-primary-foreground",
+          "hover:bg-primary/90 focus:bg-primary/90 focus:text-primary-foreground dark:focus:bg-primary/90 dark:focus:text-primary-foreground",
         primary:
           "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 focus:text-primary-foreground dark:focus:bg-primary/90 dark:focus:text-primary-foreground",
         destructive:
@@ -93,7 +93,7 @@ const pixelSelectTriggerVariants = cva(
   {
     variants: {
       variant: {
-        default: " hover:bg-primary/90",
+        default: "hover:bg-primary/90",
         primary: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "bg-red-500 text-white hover:bg-red-600 focus:bg-red-600 dark:focus:bg-red-600 dark:focus:text-white dark:hover:bg-red-600 dark:hover:text-white",
@@ -195,7 +195,7 @@ const selectContentVariants = cva(
 );
 
 const pixelSelectContentVariants = cva(
-  "relative z-50 max-h-96 min-w-[8rem] overflow-hidden font-press",
+  "relative z-50 max-h-96 min-w-[8rem] overflow-hidden font-press shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
   {
     variants: {
       variant: {
@@ -341,13 +341,22 @@ SelectContent.displayName = SelectPrimitive.Content.displayName;
 const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.Label
-    ref={ref}
-    className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
-    {...props}
-  />
-));
+>(({ className, ...props }, ref) => {
+  const { theme } = useThemeStore();
+  const isPixelTheme = theme.startsWith("nes") || theme.startsWith("snes");
+
+  return (
+    <SelectPrimitive.Label
+      ref={ref}
+      className={cn(
+        "py-1.5 pl-8 pr-2 text-sm font-semibold",
+        isPixelTheme && "font-press",
+        className
+      )}
+      {...props}
+    />
+  );
+});
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
 interface SelectItemProps
