@@ -4,6 +4,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/store/themeStore";
+import { PixelBorder } from "./pixel-border";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 active:translate-x-[2px] active:translate-y-[2px]",
@@ -11,6 +12,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
@@ -45,7 +47,8 @@ const pixelButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-blue-400 text-black hover:bg-blue-500",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        primary: "bg-blue-400 text-black hover:bg-blue-500",
         destructive: "bg-red-500 text-white hover:bg-red-600",
         outline: "bg-white text-black hover:bg-gray-100",
         secondary: "bg-gray-300 text-black hover:bg-gray-400",
@@ -121,10 +124,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           {/* Cut corners */}
           {isNes && (
             <>
-              <span className="absolute top-[-4px] left-[-4px] w-[4px] h-[4px] bg-background" />
-              <span className="absolute top-[-4px] right-[-4px] w-[4px] h-[4px] bg-background" />
-              <span className="absolute bottom-[-4px] left-[-4px] w-[4px] h-[4px] bg-background" />
-              <span className="absolute bottom-[-4px] right-[-4px] w-[4px] h-[4px] bg-background" />
+              <PixelBorder />
               <span
                 className={cn(
                   "absolute",
@@ -145,10 +145,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           )}
           {isSnes && (
             <>
-              <span className="absolute top-[-2px] left-[-2px] w-[2px] h-[2px] bg-background" />
-              <span className="absolute top-[-2px] right-[-2px] w-[2px] h-[2px] bg-background" />
-              <span className="absolute bottom-[-2px] left-[-2px] w-[2px] h-[2px] bg-background" />
-              <span className="absolute bottom-[-2px] right-[-2px] w-[2px] h-[2px] bg-background" />
+              <PixelBorder />
               <span
                 className={cn(
                   "absolute",

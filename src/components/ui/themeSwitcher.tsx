@@ -8,10 +8,7 @@ export const ThemeSwitcher: React.FC = () => {
 
   return (
     <div className="flex space-x-2">
-      <Button
-        onClick={() => setTheme("light")}
-        variant={theme === "light" ? "default" : "outline"}
-      >
+      <Button onClick={() => setTheme("light")} variant={"default"}>
         Light
       </Button>
       <Button

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -34,6 +35,12 @@ export default function Home() {
           <SelectItem value="system">System</SelectItem>
         </SelectContent>
       </Select>
+
+      <Card className="w-[300px] flex flex-col">
+        <h1 className="text-3xl">Hello World</h1>
+        <p className="text-lg">This is a card component</p>
+        <Button size={"md"}>Default Button</Button>
+      </Card>
     </main>
   );
 }
