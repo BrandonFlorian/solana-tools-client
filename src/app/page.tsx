@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { PixelBorder } from "@/components/ui/pixel-border";
 import {
   Select,
   SelectContent,
@@ -35,6 +37,7 @@ export default function Home() {
           <SelectItem value="system">System</SelectItem>
         </SelectContent>
       </Select>
+      <Input placeholder="Enter your name" />
 
       <Card className="w-[300px] flex flex-col">
         <h1 className="text-3xl">Hello World</h1>
