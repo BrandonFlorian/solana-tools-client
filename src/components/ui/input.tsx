@@ -46,11 +46,11 @@ const inputVariants = cva(
 );
 
 const pixelInputVariants = cva(
-  "flex w-full px-3 py-2 text-sm placeholder:text-zinc-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-950 dark:placeholder:text-zinc-400 font-press relative",
+  "flex w-full px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 font-press relative ",
   {
     variants: {
       variant: {
-        default: "text-primary-foreground",
+        default: "",
         primary: "text-black",
         destructive: "text-white",
         outline: "text-black",

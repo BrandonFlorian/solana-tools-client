@@ -16,9 +16,6 @@ const PixelBorder = React.forwardRef<HTMLDivElement, PixelBorderProps>(
     const isSnes = theme.startsWith("snes");
     const borderColor = invertColors ? "bg-text" : "bg-background";
 
-    console.log("isNes", isNes);
-    console.log("isSnes", isSnes);
-
     return (
       <Comp>
         <div>
