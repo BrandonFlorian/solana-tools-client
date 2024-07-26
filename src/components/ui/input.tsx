@@ -14,21 +14,30 @@ export interface InputProps
 }
 
 const inputVariants = cva(
-  "flex h-10 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-950 dark:ring-offset-zinc-950 dark:placeholder:text-zinc-400 dark:focus-visible:ring-zinc-300",
+  "bg-background flex h-10 w-full rounded-md border px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
         default: "border-primary text-primary-foreground",
-        primary: "border-blue-400 text-black",
-        destructive: "border-red-500 text-white",
-        outline: "border-white text-black",
-        secondary: "border-gray-300 text-black",
-        ghost: "border-transparent text-black",
-        link: "border-transparent text-blue-500 hover:underline",
-        success: "border-green-500 text-white",
-        warning: "border-yellow-500 text-black",
-        error: "border-red-500 text-white",
-        disabled: "border-gray-300 text-gray-500 cursor-not-allowed",
+        primary:
+          "border-blue-400 ring-offset-blue-400 placeholder-blue-400 focus-visible:ring-blue-300",
+        destructive:
+          "border-red-500 ring-offset-red-500 placeholder-red-500 focus-visible:ring-red-300",
+        outline:
+          "border-white ring-offset-white placeholder-zinc-500 focus-visible:ring-zinc-950",
+        secondary:
+          "border-gray-300 ring-offset-gray-300 placeholder-gray-300 focus-visible:ring-gray-200",
+        ghost:
+          "border-transparent ring-offset-transparent placeholder-zinc-500 focus-visible:ring-zinc-950",
+        link: "border-transparent text-blue-500 hover:underline focus-visible:ring-blue-300",
+        success:
+          "border-green-500 ring-offset-green-500 placeholder-green-500 focus-visible:ring-green-300",
+        warning:
+          "border-yellow-500 ring-offset-yellow-500 placeholder-yellow-500 focus-visible:ring-yellow-300",
+        error:
+          "border-red-500 ring-offset-red-500 placeholder-red-500 focus-visible:ring-red-300",
+        disabled:
+          "border-gray-300 cursor-not-allowed opacity-50 ring-offset-gray-300 placeholder-gray-300",
       },
       size: {
         xs: "text-xs",
@@ -46,21 +55,30 @@ const inputVariants = cva(
 );
 
 const pixelInputVariants = cva(
-  "flex w-full px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 font-press relative ",
+  "flex w-full px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 font-press relative bg-background ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 ",
   {
     variants: {
       variant: {
         default: "bg-background border-text-foreground",
-        primary: "border-blue-400 text-black",
-        destructive: "text-white border-red-500",
-        outline: "text-black border-white",
-        secondary: "text-black border-gray-300",
-        ghost: "text-black border-transparent",
-        link: "text-blue-500 border-transparent hover:underline",
-        success: "text-white border-green-500",
-        warning: "text-black border-yellow-500",
-        error: "text-white border-red-500",
-        disabled: "text-gray-500 cursor-not-allowed border-gray-300",
+        primary:
+          "border-blue-400 ring-offset-blue-400 placeholder-blue-200 focus-visible:ring-blue-300",
+        destructive:
+          "border-red-500 ring-offset-red-500 placeholder-red-200 focus-visible:ring-red-300",
+        outline:
+          "border-white ring-offset-white placeholder-zinc-500 focus-visible:ring-zinc-950",
+        secondary:
+          "border-gray-300 ring-offset-gray-300 placeholder-gray-200 focus-visible:ring-gray-200",
+        ghost:
+          "border-transparent ring-offset-transparent placeholder-zinc-500 focus-visible:ring-zinc-950",
+        link: "text-blue-500 border-transparent hover:underline focus-visible:ring-blue-300",
+        success:
+          "border-green-500 ring-offset-green-500 placeholder-green-200 focus-visible:ring-green-300",
+        warning:
+          "border-yellow-500 ring-offset-yellow-500 placeholder-yellow-200 focus-visible:ring-yellow-300",
+        error:
+          "border-red-500 ring-offset-red-500 placeholder-red-200 focus-visible:ring-red-300",
+        disabled:
+          "cursor-not-allowed border-gray-300 opacity-50 ring-offset-gray-300 placeholder-gray-200",
       },
       size: {
         xs: "h-7 text-xs",

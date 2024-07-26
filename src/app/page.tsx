@@ -40,6 +40,14 @@ export default function Home() {
         </SelectContent>
       </Select>
       <Input placeholder="Enter your name" />
+      <Input variant={"primary"} placeholder="Enter your email" />
+      <Input variant={"secondary"} placeholder="Enter your password" />
+      <Input variant={"destructive"} placeholder="Enter your password" />
+      <Input variant={"success"} placeholder="Enter your password" />
+      <Input variant={"warning"} placeholder="Enter your password" />
+      <Input variant={"error"} placeholder="Enter your password" />
+      <Input variant={"disabled"} placeholder="Enter your password" />
+      <Input variant={"outline"} placeholder="Enter your password" />
 
       <Card className="w-[300px] flex flex-col">
         <h1 className="text-3xl">Hello World</h1>
