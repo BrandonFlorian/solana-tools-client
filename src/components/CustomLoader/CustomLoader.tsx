@@ -4,7 +4,7 @@ const customLoader = ({ src }: { src: string }) => {
   return src;
 };
 
-const CustomImage = (props: ImageProps) => {
+export const CustomImage = (props: ImageProps) => {
   return (
     <Image {...props} loader={customLoader} unoptimized alt="loading..." />
   );

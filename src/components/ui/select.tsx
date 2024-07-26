@@ -14,19 +14,17 @@ const selectTriggerVariants = cva(
   {
     variants: {
       variant: {
-        default: "hover:bg-primary/90",
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        default: "",
+        primary: "bg-primary text-primary-foreground",
+        destructive: "bg-destructive text-destructive-foreground",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border border-input bg-background hover:text-accent-foreground",
+        secondary: "bg-secondary text-secondary-foreground",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        success: "bg-green-500 text-white hover:bg-green-600",
-        warning: "bg-yellow-500 text-black hover:bg-yellow-600",
-        error: "bg-red-500 text-white hover:bg-red-600",
+        success: "bg-green-500 text-white",
+        warning: "bg-yellow-500 text-black",
+        error: "bg-red-500 text-white",
         disabled: "bg-gray-300 text-gray-500 cursor-not-allowed",
       },
       size: {
@@ -93,25 +91,25 @@ const pixelSelectTriggerVariants = cva(
   {
     variants: {
       variant: {
-        default: "hover:bg-primary/90",
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "",
+        primary: "bg-primary text-primary-foreground ",
         destructive:
-          "bg-red-500 text-white hover:bg-red-600 focus:bg-red-600 dark:focus:bg-red-600 dark:focus:text-white dark:hover:bg-red-600 dark:hover:text-white",
+          "bg-red-500 text-white focus:bg-red-600 dark:focus:bg-red-600 dark:focus:text-white dark:hover:text-white",
         outline:
-          "bg-white text-black hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-zinc-800 dark:focus:text-zinc-50 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
+          "bg-white text-black focus:bg-gray-100 dark:focus:bg-zinc-800 dark:focus:text-zinc-50",
         secondary:
-          "bg-gray-300 text-black hover:bg-gray-400 focus:bg-gray-400 dark:focus:bg-gray-400 dark:focus:text-black dark:hover:bg-gray-400 dark:hover:text-black",
+          "bg-gray-300 text-black  focus:bg-gray-400 dark:focus:bg-gray-400 dark:focus:text-black",
         ghost:
-          "bg-transparent text-black hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-zinc-800 dark:focus:text-zinc-50 dark:hover:bg-zinc-800 dark:hover:text-zinc-50",
+          "bg-transparent text-black focus:bg-gray-100 dark:focus:bg-zinc-800 dark:focus:text-zinc-50",
         link: "bg-transparent text-blue-500 hover:underline focus:underline dark:focus:underline dark:hover:underline",
         success:
-          "bg-green-500 text-white hover:bg-green-600 focus:bg-green-600 dark:focus:bg-green-600 dark:focus:text-white dark:hover:bg-green-600 dark:hover:text-white",
+          "bg-green-500 text-white focus:bg-green-600 dark:focus:bg-green-600 dark:focus:text-white",
         warning:
-          "bg-yellow-500 text-black hover:bg-yellow-600 focus:bg-yellow-600 dark:focus:bg-yellow-600 dark:focus:text-black dark:hover:bg-yellow-600 dark:hover:text-black",
+          "bg-yellow-500 text-black focus:bg-yellow-600 dark:focus:bg-yellow-600 dark:focus:text-black",
         error:
-          "bg-red-500 text-white hover:bg-red-600 focus:bg-red-600 dark:focus:bg-red-600 dark:focus:text-white dark:hover:bg-red-600 dark:hover:text-white",
+          "bg-red-500 text-white focus:bg-red-600 dark:focus:bg-red-600 dark:focus:text-white",
         disabled:
-          "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-800 dark:focus:bg-zinc-800 dark:focus:text-zinc-50 dark:focus:hover:bg-zinc-800 dark:focus:hover:text-zinc-50",
+          "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-50 dark:focus:bg-zinc-800 dark:focus:text-zinc-50 dark:focus:hover:bg-zinc-800 dark:focus:hover:text-zinc-50",
       },
       size: {
         icon: "p-2",
@@ -139,17 +137,27 @@ const pixelSelectItemVariants = cva(
   {
     variants: {
       variant: {
-        default: " hover:bg-primary/90",
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-red-500 text-white hover:bg-red-600",
-        outline: "bg-white text-black hover:bg-gray-100",
-        secondary: "bg-gray-300 text-black hover:bg-gray-400",
-        ghost: "bg-transparent text-black hover:bg-gray-100",
-        link: "bg-transparent text-blue-500 hover:underline",
-        success: "bg-green-500 text-white hover:bg-green-600",
-        warning: "bg-yellow-500 text-black hover:bg-yellow-600",
-        error: "bg-red-500 text-white hover:bg-red-600",
-        disabled: "bg-gray-300 text-gray-500 cursor-not-allowed",
+        default:
+          "hover:bg-primary/90 focus:bg-primary/90 focus:text-primary-foreground dark:focus:bg-primary/90 dark:focus:text-primary-foreground",
+        primary:
+          "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90 focus:text-primary-foreground dark:focus:bg-primary/90 dark:focus:text-primary-foreground",
+        destructive:
+          "bg-red-500 text-white hover:bg-red-600 focus:bg-red-600 dark:focus:bg-red-600 dark:focus:text-white",
+        outline:
+          "bg-white text-black hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-zinc-800 dark:focus:text-zinc-50",
+        secondary:
+          "bg-gray-300 text-black hover:bg-gray-400 focus:bg-gray-400 dark:focus:bg-gray-400 dark:focus:text-black",
+        ghost:
+          "bg-transparent text-black hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-zinc-800 dark:focus:text-zinc-50",
+        link: "bg-transparent text-blue-500 hover:underline focus:underline dark:focus:underline dark:hover:underline",
+        success:
+          "bg-green-500 text-white hover:bg-green-600 focus:bg-green-600 dark:focus:bg-green-600 dark:focus:text-white",
+        warning:
+          "bg-yellow-500 text-black hover:bg-yellow-600 focus:bg-yellow-600 dark:focus:bg-yellow-600 dark:focus:text-black",
+        error:
+          "bg-red-500 text-white hover:bg-red-600 focus:bg-red-600 dark:focus:bg-red-600 dark:focus:text-white",
+        disabled:
+          "bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-800 dark:focus:bg-zinc-800",
       },
       size: {
         icon: "p-2",

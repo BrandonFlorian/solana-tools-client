@@ -11,6 +11,7 @@ import { PixelBorder } from "@/components/ui/pixel-border";
 import Image from "next/image";
 import Link from "next/link";
 import { useThemeStore } from "@/store/themeStore";
+import { CustomImage } from "../CustomLoader/CustomLoader";
 
 interface TokenCardProps {
   token: Token;
@@ -38,10 +39,10 @@ export const TokenCard: React.FC<TokenCardProps> = ({ token }) => {
       <CardHeader className="p-2">
         <div className="relative w-full pt-[100%]">
           {token.imageUri && (
-            <Image
+            <CustomImage
               src={token.imageUri}
               alt={token.name}
-              className="object-contain"
+              className="object-contain absolute top-0 left-0 w-full h-full"
               fill
             />
           )}

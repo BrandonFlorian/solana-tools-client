@@ -18,9 +18,11 @@ export default function Home() {
       <Button variant={"default"} size={"sm"}>
         Click
       </Button>
-      <Button variant={"warning"} size={"md"}>
-        Click me
-      </Button>
+      <PixelBorder>
+        <Button variant={"warning"} size={"md"}>
+          Click me 👑
+        </Button>
+      </PixelBorder>
       <Button variant={"success"} size={"lg"}>
         Click me
       </Button>
