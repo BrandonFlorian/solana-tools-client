@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { VariantProps, cva } from "class-variance-authority";
 import { useThemeStore } from "@/store/themeStore";
 import { Label } from "./label";
+import { SnesInputPixelBorder, NesInputPixelBorder } from "./pixel-border";
 type InputVariantsType = VariantProps<typeof inputVariants>;
 
 export interface InputProps
@@ -59,7 +60,7 @@ const pixelInputVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-background border-text-foreground",
+        default: "bg-background",
         primary:
           "border-blue-400 ring-offset-blue-400 placeholder-blue-200 focus-visible:ring-blue-300",
         destructive:
@@ -113,28 +114,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       className
     );
 
-    const cornerValue = pixelTheme === "nes" ? "1" : "0.5";
-
     return (
       <div>
         <Label>{props.placeholder}</Label>
         <div className="relative">
           <input type={type} className={inputClass} ref={ref} {...props} />
-          {/* needed to create this separately as the PixelBorder component would not work properly with the input */}
           {isPixelTheme && (
             <>
-              <span
-                className={`absolute top-0 left-0 w-${cornerValue} h-${cornerValue}  bg-background`}
-              />
-              <span
-                className={`absolute top-0 right-0 w-${cornerValue} h-${cornerValue} bg-background`}
-              />
-              <span
-                className={`absolute bottom-0 left-0 w-${cornerValue} h-${cornerValue} bg-background`}
-              />
-              <span
-                className={`absolute bottom-0 right-0 w-${cornerValue} h-${cornerValue} bg-background`}
-              />
+              {pixelTheme === "nes" ? (
+                <NesInputPixelBorder />
+              ) : (
+                <SnesInputPixelBorder />
+              )}
             </>
           )}
         </div>

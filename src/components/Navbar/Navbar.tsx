@@ -13,17 +13,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PixelBorder } from "@/components/ui/pixel-border";
 import { User } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Pumpscreener", href: "/pumpscreener" },
   { name: "Wallet Tracker", href: "/wallet-tracker" },
-  { name: "About", href: "/about" },
+  { name: "Options", href: "/options" },
 ];
 
 const Navbar: React.FC = () => {
+  const WalletMultiButtonDynamic = dynamic(
+    async () =>
+      (await import("@solana/wallet-adapter-react-ui")).WalletMultiButton,
+    { ssr: false }
+  );
+
+  const WalletDisconnectButtonDynamic = dynamic(
+    async () =>
+      (await import("@solana/wallet-adapter-react-ui")).WalletDisconnectButton,
+    { ssr: false }
+  );
   const pathname = usePathname();
   const { theme } = useThemeStore();
+  const { connected } = useWallet();
   const isPixelTheme = theme.startsWith("nes") || theme.startsWith("snes");
 
   return (
@@ -52,8 +66,7 @@ const Navbar: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="flex items-center">
-            <ThemeSwitcher />
+          {/* <div className="flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="ml-4">
@@ -66,6 +79,13 @@ const Navbar: React.FC = () => {
                 <DropdownMenuItem>Log out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          </div> */}
+          <div>
+            {connected ? (
+              <WalletDisconnectButtonDynamic style={buttonStyles} />
+            ) : (
+              <WalletMultiButtonDynamic style={buttonStyles} />
+            )}
           </div>
         </div>
       </div>
@@ -74,3 +94,12 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+
+const buttonStyles = {
+  backgroundColor: "#ab9ff2",
+  color: "white",
+  padding: "0.5rem 1rem",
+  borderRadius: 0,
+  border: "1px solid gray",
+  fontFamily: "inherit",
+};

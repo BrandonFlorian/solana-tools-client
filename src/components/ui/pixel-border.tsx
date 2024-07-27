@@ -60,3 +60,39 @@ const PixelBorder = React.forwardRef<HTMLDivElement, PixelBorderProps>(
 PixelBorder.displayName = "PixelBorder";
 
 export { PixelBorder };
+
+const NesInputPixelBorder = React.forwardRef<HTMLDivElement, PixelBorderProps>(
+  ({ className, asChild = false, invertColors = false, ...props }, ref) => {
+    return (
+      <>
+        <span className={`absolute top-0 left-0 w-1 h-1 bg-background`} />
+        <span className={`absolute top-0 right-0 w-1 h-1 bg-background`} />
+        <span className={`absolute bottom-0 left-0 w-1 h-1 bg-background`} />
+        <span className={`absolute bottom-0 right-0 w-1 h-1 bg-background`} />
+      </>
+    );
+  }
+);
+NesInputPixelBorder.displayName = "NesInputPixelBorder";
+
+export { NesInputPixelBorder };
+
+const SnesInputPixelBorder = React.forwardRef<HTMLDivElement, PixelBorderProps>(
+  ({ className, asChild = false, invertColors = false, ...props }, ref) => {
+    return (
+      <>
+        <span className={`absolute top-0 left-0 w-0.5 h-0.5 bg-background`} />
+        <span className={`absolute top-0 right-0 w-0.5 h-0.5 bg-background`} />
+        <span
+          className={`absolute bottom-0 left-0 w-0.5 h-0.5 bg-background`}
+        />
+        <span
+          className={`absolute bottom-0 right-0 w-0.5 h-0.5 bg-background`}
+        />
+      </>
+    );
+  }
+);
+SnesInputPixelBorder.displayName = "SnesInputPixelBorder";
+
+export { SnesInputPixelBorder };

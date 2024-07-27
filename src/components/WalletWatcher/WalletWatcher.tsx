@@ -43,10 +43,10 @@ const WalletWatcher: React.FC = () => {
           />
           <Input
             placeholder="SOL per trade"
-            type="number"
+            type="text"
             value={bidAmount}
             onChange={(e) => setBidAmount(e.target.value)}
-            className="md:w-32"
+            //className="md:w-32"
           />
           <Button onClick={handleAddWallet}>Add Wallet</Button>
         </div>

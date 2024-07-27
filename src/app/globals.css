@@ -163,12 +163,24 @@
   --ring: 240 70% 50%;
 }
 
+/* Pixel theme styles */
+.nes-light,
+.nes-dark,
 .snes-light,
 .snes-dark {
   font-family: "Press Start 2P", cursive;
 }
 
+body.nes-light,
+body.nes-dark,
 body.snes-light,
 body.snes-dark {
+  font-family: "Press Start 2P", cursive;
+}
+
+.nes-light *,
+.nes-dark *,
+.snes-light *,
+.snes-dark * {
   font-family: "Press Start 2P", cursive;
 }
