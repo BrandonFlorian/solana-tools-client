@@ -2,7 +2,13 @@
 
 ## Overview
 
-This Next.js application integrates with Solana wallets to provide token-gated access to exclusive content. It features a modern, responsive design with customizable themes, including pixel art inspired "NES" and "SNES" modes.
+This Next.js application started as a re-implementation of one of my favorite libraries Nes.css. 
+
+There are some react implementation out there already of Nes.css, but they were out of date or had some issues so I decided to just recreate the features myself using shadcn as a component base, and tailwind for styling. This repo will be updated as I complete the individual components. 
+
+I have set up a theme store in this app with zustand, and if you navigate to the options menu, it features a modern, responsive design with light and dark themes, including pixel art inspired "NES" and "SNES" modes.
+
+Integrates with Solana wallets to provide a quick set up for a front end to begin using dApps on Solana blockchain. 
 
 ## Features
 
@@ -81,7 +87,6 @@ This Next.js application integrates with Solana wallets to provide token-gated a
 ## Key Components
 
 - `WalletProviderLayout` - Provides Solana wallet context to the app
-- `TokenGatedPage` - Implements token-gating logic (TODO)
 - `OptionsThemeSelector` - Allows users to switch between visual themes
 
 ## Middleware (WIP)
