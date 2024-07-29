@@ -1,4 +1,4 @@
-# Next.js Solana Token-Gated App
+# Next.js Solana Ready App
 
 ## Overview
 
