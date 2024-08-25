@@ -71,7 +71,7 @@ export interface Token {
   showName: boolean;
   kingOfTheHillTimestamp: number | null;
   marketCap: number;
-  replyCount: number
+  replyCount: number;
   lastReply: number;
   nsfw: boolean;
   marketId: string | null;
