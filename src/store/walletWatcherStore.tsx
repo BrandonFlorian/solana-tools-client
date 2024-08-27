@@ -1,6 +1,7 @@
 // store/walletTrackerStore.ts
+import { ToastAction } from "@/components/ui/toast";
+import { toast } from "@/components/ui/use-toast";
 import { API_BASE_URL } from "@/config/constants";
-import { get } from "http";
 import { create } from "zustand";
 
 export interface CopyTradeSettings {
@@ -74,8 +75,7 @@ export interface ClientTxInfo {
 
 export interface TradeNotification {
   type: "copy_trade_execution";
-  trade_type: string;
-  transaction_data: {
+  data: {
     signature: string;
     tokenAddress: string;
     tokenName: string;
@@ -140,8 +140,14 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
   setCopyTradeSettings: (settings) => set({ copyTradeSettings: settings }),
   setRecentTransactions: (transactions) =>
     set({ recentTransactions: transactions }),
-  addNotification: (notification) =>
-    set((state) => ({ notifications: [notification, ...state.notifications] })),
+  addNotification: (notification) => {
+    set((state) => ({ notifications: [notification, ...state.notifications] }));
+    toast({
+      title: notification.type,
+      description: `${notification.data.transactionType} ${notification.data.amountToken} ${notification.data.tokenSymbol} for ${notification.data.amountSol} SOL`,
+      action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
+    });
+  },
   addWallet: (wallet) => {
     set({
       trackedWallet: {

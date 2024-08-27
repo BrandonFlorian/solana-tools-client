@@ -19,8 +19,13 @@ export const TransactionList: React.FC = () => {
           <ul>
             {recentTransactions.map((tx) => (
               <li key={tx.id}>
-                {tx.transaction_type} {tx.token_address}: {tx.amount} at{" "}
-                {tx.price_sol} SOL
+                <div className="flex items-center justify-between">
+                  <p>{tx.transaction_type}: </p>
+                  <p>{tx.token_address}:</p>
+                  <p>{tx.amount}</p>
+                  <p>at {tx.price_sol} SOL</p>
+                  <p>{tx.timestamp}</p>
+                </div>
               </li>
             ))}
           </ul>

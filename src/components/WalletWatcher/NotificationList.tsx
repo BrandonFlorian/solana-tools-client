@@ -23,19 +23,19 @@ export const NotificationList: React.FC = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>
-                      {notification.type}: {notification.trade_type}
+                      {notification.type}: {notification.data.transactionType}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Avatar>
+                    {/* <Avatar>
                       <AvatarImage
                         src={notification.transaction_data.tokenImageUri}
                       />
-                    </Avatar>
+                    </Avatar> */}
                     <p>
-                      {notification.transaction_data.amountToken}
-                      {notification.transaction_data.tokenSymbol} at{" "}
-                      {notification.transaction_data.amountSol} SOL
+                      {notification.data.amountToken}
+                      {notification.data.tokenSymbol} at{" "}
+                      {notification.data.amountSol} SOL
                     </p>
                   </CardContent>
                 </Card>

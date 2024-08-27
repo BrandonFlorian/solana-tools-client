@@ -8,7 +8,12 @@ const useWalletTrackerWebSocket = (url: string) => {
 
   const [isConnected, setIsConnected] = useState(false);
 
-  const { addNotification } = useWalletTrackerStore();
+  const {
+    addNotification,
+    recentTransactions,
+    setRecentTransactions,
+    setServerWallet,
+  } = useWalletTrackerStore();
 
   const sendMessage = useCallback((message: string) => {
     if (socketRef.current?.readyState === WebSocket.OPEN) {
@@ -37,11 +42,22 @@ const useWalletTrackerWebSocket = (url: string) => {
       if (event.data === undefined) return;
       try {
         const data = JSON.parse(event.data);
-        if (data.type === "copy_trade_execution") {
-          addNotification(data);
-        }
-        if (data.type === "tracked_wallet_transaction") {
-          addNotification(data);
+        switch (data.type) {
+          case "copy_trade_execution":
+            addNotification(data);
+            break;
+          case "tracked_wallet_trade":
+            addNotification(data);
+            break;
+          case "transaction_logged":
+            setRecentTransactions([...recentTransactions, data.data]);
+            break;
+          case "wallet_update":
+            console.log("Server wallet updated:", data.data);
+            setServerWallet(data.data);
+            break;
+          default:
+            console.log("Unknown message type:", data.type);
         }
         // Add more conditions here for other types of messages
       } catch (error) {
