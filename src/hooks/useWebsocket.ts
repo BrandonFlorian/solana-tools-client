@@ -1,6 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef } from "react";
-
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTokenStore } from "@/store/pumpfunStore";
 import { CoinData, Token, TokenWebsocketResponse } from "@/types/crypto";
 
@@ -10,6 +9,7 @@ const useWebSocket = (url: string, apiUrl: string) => {
 
   const addOrUpdateToken = useTokenStore((state) => state.addOrUpdateToken);
   const getTokenByAddress = useTokenStore((state) => state.getTokenByAddress);
+  const [isConnected, setIsConnected] = useState(false);
 
   const transformMintData = useCallback((data: CoinData): Partial<Token> => {
     const token: Partial<Token> = {
@@ -93,9 +93,9 @@ const useWebSocket = (url: string, apiUrl: string) => {
 
     socketRef.current.onopen = () => {
       console.log("WebSocket connection established");
+      setIsConnected(true);
       const initMessage = JSON.stringify({
         bot_command: "start",
-        trading_algorithm: "buy_all",
       });
       sendMessage(initMessage);
     };
@@ -105,6 +105,7 @@ const useWebSocket = (url: string, apiUrl: string) => {
       if (event.data === undefined) return;
       try {
         const data: TokenWebsocketResponse = JSON.parse(event.data);
+        console.log("Parsed WebSocket message:", data);
         if (data.coin_data) {
           handleEvent(data.coin_data);
         }
@@ -115,12 +116,14 @@ const useWebSocket = (url: string, apiUrl: string) => {
 
     socketRef.current.onclose = (event) => {
       console.log(`WebSocket connection closed: ${event}`);
+      setIsConnected(false);
       // Attempt to reconnect after a delay
       reconnectTimeoutRef.current = setTimeout(connectWebSocket, 5000);
     };
 
     socketRef.current.onerror = (error) => {
       console.error("WebSocket error:", error);
+      setIsConnected(false);
     };
   }, [url, handleEvent, sendMessage]);
 
@@ -137,7 +140,7 @@ const useWebSocket = (url: string, apiUrl: string) => {
     };
   }, [connectWebSocket]);
 
-  return { sendMessage };
+  return { sendMessage, isConnected };
 };
 
 export default useWebSocket;

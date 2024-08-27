@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import useWebSocket from "@/hooks/useWebsocket";
-import { API_URL, WEBSOCKET_URL } from "@/config/constants";
+import { API_URL, PUMPSCREENER_WEBSOCKET_URL } from "@/config/constants";
 import { useTokenStore } from "@/store/pumpfunStore";
 
 import { TokenFilters } from "@/components/TokenFilters/TokenFilters";
@@ -9,7 +9,7 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { TokenCard } from "@/components/TokenCard/TokenCard";
 
 const TokenGallery: React.FC = () => {
-  useWebSocket(WEBSOCKET_URL, API_URL);
+  useWebSocket(PUMPSCREENER_WEBSOCKET_URL, API_URL);
   const filteredTokens = useTokenStore((state) => state.filteredTokens);
   const applyFiltersAndSort = useTokenStore(
     (state) => state.applyFiltersAndSort
