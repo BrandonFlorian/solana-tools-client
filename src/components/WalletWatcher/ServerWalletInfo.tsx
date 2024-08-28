@@ -41,7 +41,6 @@ export const ServerWalletInfo: React.FC = () => {
 
   if (!serverWallet) return null;
 
-  console.log(serverWallet);
   return (
     <Card>
       <CardHeader>
