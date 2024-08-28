@@ -1,5 +1,5 @@
 // hooks/useWalletTrackerWebSocket.ts
-import { useWalletTrackerStore } from "@/store/walletWatcherStore";
+import { Transaction, useWalletTrackerStore } from "@/store/walletWatcherStore";
 import { useState, useEffect, useCallback, useRef } from "react";
 
 const useWalletTrackerWebSocket = (url: string) => {
@@ -50,14 +50,18 @@ const useWalletTrackerWebSocket = (url: string) => {
             addNotification(data);
             break;
           case "transaction_logged":
-            setRecentTransactions([...recentTransactions, data.data]);
+            // setRecentTransactions((prevTransactions: Transaction[]) => [
+            //   ...prevTransactions,
+            //   data.data,
+            // ]);
+
             break;
           case "wallet_update":
-            console.log("Server wallet updated:", data.data);
+            //console.log("Server wallet updated:", data.data);
             setServerWallet(data.data);
             break;
           default:
-            console.log("Unknown message type:", data.type);
+            console.log("Unknown message type:", data);
         }
         // Add more conditions here for other types of messages
       } catch (error) {
@@ -76,7 +80,14 @@ const useWalletTrackerWebSocket = (url: string) => {
       console.error("WebSocket error:", error);
       setIsConnected(false);
     };
-  }, [url, sendMessage, addNotification]);
+  }, [
+    url,
+    sendMessage,
+    addNotification,
+    setRecentTransactions,
+    recentTransactions,
+    setServerWallet,
+  ]);
 
   useEffect(() => {
     connectWebSocket();

@@ -62,9 +62,9 @@ export const WalletTracker: React.FC = () => {
       <TrackWallet />
       <ServerWalletInfo />
       <TrackedWalletInfo />
-      <div className="mt-8">
+      {/* <div className="mt-8">
         <TransactionList />
-      </div>
+      </div> */}
       <div className="mt-8">
         <NotificationList />
       </div>

@@ -1,5 +1,4 @@
 // store/walletTrackerStore.ts
-import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/components/ui/use-toast";
 import { API_BASE_URL } from "@/config/constants";
 import { create } from "zustand";
@@ -138,15 +137,22 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
   setTrackedWallet: (wallet) => set({ trackedWallet: wallet }),
   setServerWallet: (wallet) => set({ serverWallet: wallet }),
   setCopyTradeSettings: (settings) => set({ copyTradeSettings: settings }),
-  setRecentTransactions: (transactions) =>
-    set({ recentTransactions: transactions }),
+  setRecentTransactions: (
+    updater: Transaction[] | ((prev: Transaction[]) => Transaction[])
+  ) =>
+    set((state) => {
+      const newTransactions =
+        typeof updater === "function"
+          ? updater(state.recentTransactions)
+          : updater;
+      return { recentTransactions: newTransactions.slice(0, 50) }; // Keep only the 50 most recent
+    }),
   addNotification: (notification) => {
-    set((state) => ({ notifications: [notification, ...state.notifications] }));
     toast({
       title: notification.type,
-      description: `${notification.data.transactionType} ${notification.data.amountToken} ${notification.data.tokenSymbol} for ${notification.data.amountSol} SOL`,
-      action: <ToastAction altText="Goto schedule to undo">Undo</ToastAction>,
+      description: `${notification?.data?.transactionType} ${notification?.data?.amountToken} ${notification?.data?.tokenSymbol} for ${notification?.data?.amountSol} SOL`,
     });
+    set((state) => ({ notifications: [notification, ...state.notifications] }));
   },
   addWallet: (wallet) => {
     set({
@@ -177,7 +183,7 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
       recentTransactions: [transaction, ...state.recentTransactions].slice(
         0,
         50
-      ), // Keep only the 50 most recent transactions
+      ),
     })),
   fetchServerWallet: async () => {
     try {

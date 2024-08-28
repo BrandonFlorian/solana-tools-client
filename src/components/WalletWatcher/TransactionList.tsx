@@ -18,7 +18,7 @@ export const TransactionList: React.FC = () => {
         ) : (
           <ul>
             {recentTransactions.map((tx) => (
-              <li key={tx.id}>
+              <li key={tx.signature}>
                 <div className="flex items-center justify-between">
                   <p>{tx.transaction_type}: </p>
                   <p>{tx.token_address}:</p>
