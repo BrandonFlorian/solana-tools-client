@@ -9,6 +9,12 @@ export interface CopyTradeSettings {
   is_enabled: boolean;
   trade_amount_sol?: number;
   max_slippage?: number;
+  max_open_positions?: number;
+  use_allowed_tokens?: boolean;
+  allowed_tokens?: string[];
+  match_sell_percentage?: boolean;
+  min_sol_balance?: number;
+  allow_additional_buys?: boolean;
 }
 
 export interface BuyTokenRequest {
@@ -24,6 +30,44 @@ export interface SellTokenRequest {
   slippage: number;
   amount_tokens?: number;
 }
+export interface SellTransactionData {
+  type: string;
+  amount_tokens: number;
+  slippage: number;
+}
+
+export interface SellTokeData {
+  address: string;
+  symbol: string;
+  name: string;
+}
+
+export interface SellTransactionResponse {
+  success: boolean;
+  signature: string;
+  token_data: SellTokeData;
+  transaction_data: SellTransactionData;
+}
+
+export interface BuyTransactionData {
+  type: string;
+  amount_sol: number;
+  slippage: number;
+}
+
+export interface BuyTokeData {
+  address: string;
+  symbol: string;
+  name: string;
+}
+
+export interface BuyTransactionResponse {
+  success: boolean;
+  signature: string;
+  token_data: BuyTokeData;
+  transaction_data: BuyTransactionData;
+}
+
 export interface TrackedWallet {
   id: string;
   is_active: boolean;
@@ -72,8 +116,19 @@ export interface ClientTxInfo {
   buyer: string;
 }
 
-export interface TradeNotification {
-  type: "copy_trade_execution";
+export type NotificationType =
+  | "copy_trade_execution"
+  | "tracked_wallet_trade"
+  | "server_wallet_trade"
+  | "transaction_logged";
+
+export interface BaseNotification {
+  type: NotificationType;
+  timestamp: number;
+}
+
+export interface TradeNotification extends BaseNotification {
+  type: "copy_trade_execution" | "tracked_wallet_trade";
   data: {
     signature: string;
     tokenAddress: string;
@@ -86,13 +141,45 @@ export interface TradeNotification {
     tokenImageUri: string;
     marketCap: number;
     usdMarketCap: number;
-    timestamp: number;
     seller: string;
     buyer: string;
   };
 }
 
-type Notification = TradeNotification; // Add other notification types here if needed
+export interface ServerWalletTradeNotification extends BaseNotification {
+  type: "server_wallet_trade";
+  data: {
+    signature: string;
+    tokenAddress: string;
+    tokenName: string;
+    tokenSymbol: string;
+    transactionType: "BUY" | "SELL";
+    amount: number;
+    price: number;
+  };
+}
+
+export interface TransactionLoggedNotification extends BaseNotification {
+  type: "transaction_logged";
+  data: {
+    signature: string;
+    tokenAddress: string;
+    transactionType: "BUY" | "SELL";
+    amount: number;
+    price: number;
+  };
+}
+
+export type Notification =
+  | TradeNotification
+  | ServerWalletTradeNotification
+  | TransactionLoggedNotification;
+
+export interface UpdateTrackedWalletPayload {
+  old_wallet_address: string;
+  new_wallet_address: string;
+  is_active: boolean;
+}
 
 interface WalletTrackerState {
   trackedWallet: TrackedWallet | null;
@@ -104,7 +191,7 @@ interface WalletTrackerState {
   setServerWallet: (wallet: ServerWalletInfo | null) => void;
   setCopyTradeSettings: (settings: CopyTradeSettings | null) => void;
   setRecentTransactions: (transactions: Transaction[]) => void;
-  addNotification: (notification: Notification) => void;
+  addNotification: (notification: Omit<Notification, "timestamp">) => void;
   addWallet: (wallet: TrackedWallet) => void;
   removeWallet: () => void;
   updateServerWallet: (updatedWallet: Partial<ServerWalletInfo>) => void;
@@ -113,15 +200,17 @@ interface WalletTrackerState {
   fetchServerWallet: () => void;
   fetchTrackedWallets: () => void;
   fetchTransactionHistory: () => void;
-  addTrackedWallet: (address: string, solPerTrade: number) => Promise<void>;
+  addTrackedWallet: (address: string) => Promise<void>;
   removeTrackedWallet: (address: string) => Promise<void>;
   updateTrackedWallet: (address: string, isActive: boolean) => Promise<void>;
   createCopyTradeSettings: (settings: CopyTradeSettings) => Promise<void>;
   updateCopyTradeSettings: (settings: CopyTradeSettings) => Promise<void>;
   deleteCopyTradeSettings: (trackedWalletId: string) => Promise<void>;
   fetchCopyTradeSettings: () => void;
-  buyToken: (buyRequest: BuyTokenRequest) => Promise<void>;
-  sellToken: (sellRequest: SellTokenRequest) => Promise<void>;
+  buyToken: (buyRequest: BuyTokenRequest) => Promise<BuyTransactionResponse>;
+  sellToken: (
+    sellRequest: SellTokenRequest
+  ) => Promise<SellTransactionResponse>;
   error: string | null;
   isLoading: boolean;
   setError: (error: string | null) => void;
@@ -147,12 +236,41 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
           : updater;
       return { recentTransactions: newTransactions.slice(0, 50) }; // Keep only the 50 most recent
     }),
-  addNotification: (notification) => {
+  addNotification: (notification: Omit<Notification, "timestamp">) => {
+    const notificationWithTimestamp = {
+      ...notification,
+      timestamp: Date.now(),
+    };
+
+    let toastMessage = "";
+    if (
+      notification.type === "copy_trade_execution" ||
+      notification.type === "tracked_wallet_trade"
+    ) {
+      const convertedNotification: TradeNotification =
+        notification as TradeNotification;
+      toastMessage = `${convertedNotification.data.transactionType} ${convertedNotification.data.amountToken} ${convertedNotification.data.tokenSymbol} for ${convertedNotification.data.amountSol} SOL`;
+    } else if (notification.type === "server_wallet_trade") {
+      const convertedNotification: ServerWalletTradeNotification =
+        notification as ServerWalletTradeNotification;
+      toastMessage = `${convertedNotification.data.transactionType} ${convertedNotification.data.amount} ${convertedNotification.data.tokenSymbol} for ${convertedNotification.data.price} SOL`;
+    } else if (notification.type === "transaction_logged") {
+      const convertedNotification: TransactionLoggedNotification =
+        notification as TransactionLoggedNotification;
+      toastMessage = `${convertedNotification.data.transactionType} ${convertedNotification.data.amount} tokens for ${convertedNotification.data.price} SOL`;
+    }
+
     toast({
       title: notification.type,
-      description: `${notification?.data?.transactionType} ${notification?.data?.amountToken} ${notification?.data?.tokenSymbol} for ${notification?.data?.amountSol} SOL`,
+      description: toastMessage,
     });
-    set((state) => ({ notifications: [notification, ...state.notifications] }));
+
+    set((state) => ({
+      notifications: [
+        notificationWithTimestamp as Notification,
+        ...state.notifications.slice(0, 49),
+      ],
+    }));
   },
   addWallet: (wallet) => {
     set({
@@ -196,15 +314,14 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
     }
   },
 
-  addTrackedWallet: async (walletAddress: string, solPerTrade: number) => {
+  addTrackedWallet: async (walletAddress: string) => {
     try {
       const response = await fetch(`${API_BASE_URL}/tracked_wallets`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           wallet_address: walletAddress,
-          is_active: false,
-          sol_per_trade: solPerTrade,
+          is_active: true,
         }),
       });
       if (!response.ok) throw new Error("Failed to add tracked wallet");
@@ -320,7 +437,9 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
     }
   },
 
-  buyToken: async (buyRequest: BuyTokenRequest) => {
+  buyToken: async (
+    buyRequest: BuyTokenRequest
+  ): Promise<BuyTransactionResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/buy_token`, {
         method: "POST",
@@ -328,14 +447,31 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
         body: JSON.stringify(buyRequest),
       });
       if (!response.ok) throw new Error("Failed to buy token");
-      const data = await response.json();
+      const data: BuyTransactionResponse = await response.json();
       return data;
     } catch (error) {
       console.error("Error buying token:", error);
+      return {
+        success: false,
+        signature: "",
+        token_data: {
+          address: buyRequest.token_address,
+          symbol: "",
+          name: "",
+        },
+        transaction_data: {
+          type: "BUY",
+          amount_sol: 0,
+          slippage: buyRequest.slippage,
+        },
+      };
     }
   },
 
-  sellToken: async (sellRequest: SellTokenRequest) => {
+  //return a promise that resolves to the response data and declare the return type as SellTransactionResponse
+  sellToken: async (
+    sellRequest: SellTokenRequest
+  ): Promise<SellTransactionResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/sell_token`, {
         method: "POST",
@@ -343,10 +479,24 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
         body: JSON.stringify(sellRequest),
       });
       if (!response.ok) throw new Error("Failed to sell token");
-      const data = await response.json();
+      const data: SellTransactionResponse = await response.json();
       return data;
     } catch (error) {
       console.error("Error selling token:", error);
+      return {
+        success: false,
+        signature: "",
+        token_data: {
+          address: sellRequest.token_address,
+          symbol: "",
+          name: "",
+        },
+        transaction_data: {
+          type: "SELL",
+          amount_tokens: 0,
+          slippage: sellRequest.slippage,
+        },
+      };
     }
   },
   error: null,

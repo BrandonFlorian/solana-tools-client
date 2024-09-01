@@ -1,15 +1,16 @@
 "use client";
-import React, { useEffect } from "react";
-import { ServerWalletInfo } from "./ServerWalletInfo";
-import { TransactionList } from "./TransactionList";
+import React from "react";
+
+import { CopyTradeSettingsPanel } from "./CopyTradeSettings";
+
 import { NotificationList } from "./NotificationList";
 import { useWalletTrackerStore } from "@/store/walletWatcherStore";
-import { TrackedWalletInfo } from "./TrackedWalletInfo";
 import useWalletTrackerWebSocket from "@/hooks/useWalletTrackerWebsocket";
 import { WALLET_TRACKER_WEBSOCKET_URL } from "@/config/constants";
-import { TrackWallet } from "./TrackWallet";
+import { TrackedWalletCard } from "./TrackedWalletCard";
+import { ServerWalletSummary } from "./ServerWalletSummary";
 
-export const WalletTracker: React.FC = () => {
+export const WalletTracker = () => {
   const {
     fetchServerWallet,
     fetchTrackedWallets,
@@ -17,18 +18,14 @@ export const WalletTracker: React.FC = () => {
     fetchTransactionHistory,
     error,
     isLoading,
-    setIsLoading,
-    setError,
   } = useWalletTrackerStore();
 
   const { isConnected } = useWalletTrackerWebSocket(
     WALLET_TRACKER_WEBSOCKET_URL
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
       try {
         await Promise.all([
           fetchServerWallet(),
@@ -36,10 +33,8 @@ export const WalletTracker: React.FC = () => {
           fetchCopyTradeSettings(),
           fetchTransactionHistory(),
         ]);
-      } catch (err: any) {
-        setError(err);
-      } finally {
-        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching data:", err);
       }
     };
 
@@ -49,25 +44,23 @@ export const WalletTracker: React.FC = () => {
     fetchTrackedWallets,
     fetchCopyTradeSettings,
     fetchTransactionHistory,
-    setIsLoading,
-    setError,
   ]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-6">
       <h1 className="text-2xl font-bold mb-4">Wallet Tracker</h1>
-      <TrackWallet />
-      <ServerWalletInfo />
-      <TrackedWalletInfo />
-      {/* <div className="mt-8">
-        <TransactionList />
-      </div> */}
-      <div className="mt-8">
-        <NotificationList />
+
+      <TrackedWalletCard />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <CopyTradeSettingsPanel />
+        <ServerWalletSummary />
       </div>
+
+      <NotificationList />
     </div>
   );
 };

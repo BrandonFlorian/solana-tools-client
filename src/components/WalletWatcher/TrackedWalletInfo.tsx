@@ -16,9 +16,10 @@ export const TrackedWalletInfo: React.FC = () => {
     copyTradeSettings,
     updateCopyTradeSettings,
     removeTrackedWallet,
-    isLoading,
     setIsLoading,
     sellToken,
+    addTrackedWallet,
+    isLoading,
   } = useWalletTrackerStore();
 
   const [isEnabled, setIsEnabled] = useState(
@@ -27,7 +28,7 @@ export const TrackedWalletInfo: React.FC = () => {
   const [solAmount, setSolAmount] = useState(
     copyTradeSettings?.trade_amount_sol?.toString() || ""
   );
-
+  const [walletAddress, setWalletAddress] = useState<string>("");
   const [sellAmounts, setSellAmounts] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -39,29 +40,6 @@ export const TrackedWalletInfo: React.FC = () => {
 
   const handleSolAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSolAmount(e.target.value);
-  };
-
-  const handleSellAmountChange = (tokenAddress: string, amount: string) => {
-    setSellAmounts({ ...sellAmounts, [tokenAddress]: amount });
-  };
-
-  const handleSellToken = async (tokenAddress: string) => {
-    setIsLoading(true);
-    try {
-      const sellRequest: SellTokenRequest = {
-        dex_type: "pump_fun", // Assuming pump_fun as the default DEX
-        token_address: tokenAddress,
-        slippage: 0.01, // Default slippage, you might want to make this configurable
-      };
-      if (sellAmounts[tokenAddress]) {
-        sellRequest.amount_tokens = parseFloat(sellAmounts[tokenAddress]);
-      }
-      await sellToken(sellRequest);
-    } catch (error) {
-      console.error("Failed to sell token", error);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleToggle = async () => {
@@ -83,6 +61,12 @@ export const TrackedWalletInfo: React.FC = () => {
           max_slippage: copyTradeSettings?.max_slippage,
           user_id: copyTradeSettings?.user_id,
           tracked_wallet_id: copyTradeSettings?.tracked_wallet_id,
+          match_sell_percentage: copyTradeSettings?.match_sell_percentage,
+          max_open_positions: copyTradeSettings?.max_open_positions,
+          min_sol_balance: copyTradeSettings?.min_sol_balance,
+          use_allowed_tokens: copyTradeSettings?.use_allowed_tokens,
+          allowed_tokens: copyTradeSettings?.allowed_tokens,
+          allow_additional_buys: copyTradeSettings?.allow_additional_buys,
         };
 
         await updateCopyTradeSettings(settings);
@@ -119,6 +103,24 @@ export const TrackedWalletInfo: React.FC = () => {
     }
   };
 
+  const handleSetWalletAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWalletAddress(e.target.value);
+  };
+
+  const handleTrackWallet = async () => {
+    setIsLoading(true);
+    try {
+      if (walletAddress === "") {
+        throw new Error("Wallet address is required");
+      }
+      await addTrackedWallet(walletAddress);
+    } catch (error) {
+      console.error("Failed to sell token", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -126,20 +128,13 @@ export const TrackedWalletInfo: React.FC = () => {
       </CardHeader>
       <CardContent>
         <p>Address: {trackedWallet.wallet_address}</p>
-        <div className="flex items-center space-x-2 mt-2">
-          <Input
-            type="number"
-            value={solAmount}
-            onChange={handleSolAmountChange}
-            placeholder="SOL amount"
-          />
-          <Button onClick={handleUpdateSettings}>Update</Button>
-        </div>
         <div className="flex items-center mt-4">
-          <Switch checked={isEnabled} onCheckedChange={handleToggle} />
-          <span className="ml-2">
-            Copy Trading: {isEnabled ? "Enabled" : "Disabled"}
-          </span>
+          <Input
+            type="text"
+            value={walletAddress}
+            onChange={handleSetWalletAddress}
+            placeholder="Track Wallet Address"
+          />
         </div>
         <Button
           onClick={() => removeTrackedWallet(trackedWallet.wallet_address)}

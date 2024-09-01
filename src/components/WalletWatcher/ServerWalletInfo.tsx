@@ -13,8 +13,13 @@ import { Avatar, AvatarImage } from "../ui/avatar";
 import CustomImage from "../CustomLoader/CustomLoader";
 
 export const ServerWalletInfo: React.FC = () => {
-  const { serverWallet, isLoading, sellToken, setIsLoading } =
-    useWalletTrackerStore();
+  const {
+    serverWallet,
+    isLoading,
+    sellToken,
+    setIsLoading,
+    copyTradeSettings,
+  } = useWalletTrackerStore();
   const [sellAmounts, setSellAmounts] = useState<{ [key: string]: string }>({});
   const handleSellAmountChange = (tokenAddress: string, amount: string) => {
     setSellAmounts({ ...sellAmounts, [tokenAddress]: amount });
@@ -26,7 +31,7 @@ export const ServerWalletInfo: React.FC = () => {
       const sellRequest: SellTokenRequest = {
         dex_type: "pump_fun", // Assuming pump_fun as the default DEX
         token_address: tokenAddress,
-        slippage: 0.01, // Default slippage, you might want to make this configurable
+        slippage: copyTradeSettings?.max_slippage || 0.2, // Default slippage, you might want to make this configurable
       };
       if (sellAmounts[tokenAddress]) {
         sellRequest.amount_tokens = parseFloat(sellAmounts[tokenAddress]);

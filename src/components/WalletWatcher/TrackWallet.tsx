@@ -2,13 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import {
-  CopyTradeSettings,
-  SellTokenRequest,
-  TrackedWallet,
-  useWalletTrackerStore,
-} from "@/store/walletWatcherStore";
+import { useWalletTrackerStore } from "@/store/walletWatcherStore";
 import { Input } from "../ui/input";
 
 export const TrackWallet: React.FC = () => {
@@ -16,8 +10,6 @@ export const TrackWallet: React.FC = () => {
 
   const [solPerTrade, setSolPerTrade] = useState<number>(0.001);
   const [walletAddress, setWalletAddress] = useState<string>("");
-
-  useEffect(() => {}, []);
 
   const handleSetSolPerTrade = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSolPerTrade(parseFloat(e.target.value));
@@ -33,7 +25,7 @@ export const TrackWallet: React.FC = () => {
       if (walletAddress === "") {
         throw new Error("Wallet address is required");
       }
-      await addTrackedWallet(walletAddress, solPerTrade);
+      await addTrackedWallet(walletAddress);
     } catch (error) {
       console.error("Failed to sell token", error);
     } finally {
