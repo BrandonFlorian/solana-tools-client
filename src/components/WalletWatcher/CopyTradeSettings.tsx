@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useWalletTrackerStore } from "@/store/walletWatcherStore";
+import {
+  CopyTradeSettingsNotification,
+  UpdateCopyTradeSettingsResponse,
+  useWalletTrackerStore,
+} from "@/store/walletWatcherStore";
 import { toast } from "@/components/ui/use-toast";
 
 export const CopyTradeSettingsPanel: React.FC = () => {
@@ -13,9 +17,10 @@ export const CopyTradeSettingsPanel: React.FC = () => {
     copyTradeSettings,
     setCopyTradeSettings,
     updateCopyTradeSettings,
-    isLoading,
-    setIsLoading,
+    addNotification,
   } = useWalletTrackerStore();
+
+  const [isLoading, setIsLoading] = React.useState(false);
 
   if (!copyTradeSettings) return null;
 
@@ -47,11 +52,16 @@ export const CopyTradeSettingsPanel: React.FC = () => {
   const handleUpdateSettings = async () => {
     setIsLoading(true);
     try {
-      await updateCopyTradeSettings(copyTradeSettings);
-      toast({
-        title: "Success",
-        description: "Copy trade settings updated successfully",
-      });
+      const response: UpdateCopyTradeSettingsResponse =
+        await updateCopyTradeSettings(copyTradeSettings);
+      if (!response) {
+        throw new Error("Failed to update copy trade settings");
+      }
+      const notification: Omit<CopyTradeSettingsNotification, "timestamp"> = {
+        type: "copy_trade_settings_change",
+        data: copyTradeSettings,
+      };
+      addNotification(notification);
     } catch (error) {
       console.error("Failed to update copy trade settings:", error);
       toast({

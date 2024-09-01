@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useWalletTrackerStore } from "@/store/walletWatcherStore";
+import {
+  TrackedWalletChangeNotification,
+  UpdateTrackedWalletResponse,
+  useWalletTrackerStore,
+} from "@/store/walletWatcherStore";
 import {
   Dialog,
   DialogContent,
@@ -12,16 +16,71 @@ import {
 } from "@/components/ui/dialog";
 
 export const TrackedWalletCard = () => {
-  const { trackedWallet, removeTrackedWallet, addTrackedWallet } =
-    useWalletTrackerStore();
+  const {
+    trackedWallet,
+    removeTrackedWallet,
+    addTrackedWallet,
+    setTrackedWallet,
+    updateTrackedWallet,
+    addNotification,
+    removeWallet,
+  } = useWalletTrackerStore();
   const [newWalletAddress, setNewWalletAddress] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTrackWallet = async () => {
-    if (newWalletAddress) {
-      await addTrackedWallet(newWalletAddress);
-      setNewWalletAddress("");
-      setIsDialogOpen(false);
+    try {
+      if (newWalletAddress) {
+        setIsLoading(true);
+        if (trackedWallet) {
+          const payload = {
+            tracked_wallet_id: trackedWallet.id,
+            old_wallet_address: trackedWallet.wallet_address,
+            new_wallet_address: newWalletAddress,
+          };
+          const response: UpdateTrackedWalletResponse =
+            await updateTrackedWallet(payload);
+          console.log("update response", response);
+          if (response.success) {
+            setTrackedWallet({
+              id: response.new_tracked_wallet_id,
+              wallet_address: newWalletAddress,
+            });
+          }
+        } else {
+          await addTrackedWallet(newWalletAddress);
+        }
+        const notification: Omit<TrackedWalletChangeNotification, "timestamp"> =
+          {
+            type: "tracked_wallet_change",
+            data: {
+              oldWalletAddress: trackedWallet?.wallet_address || "",
+              newWalletAddress: newWalletAddress,
+            },
+          };
+        setNewWalletAddress("");
+        setIsDialogOpen(false);
+        addNotification(notification);
+      }
+    } catch (error) {
+      console.error("Failed to sell token", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemoveTrackedWallet = async () => {
+    try {
+      setIsLoading(true);
+      if (trackedWallet) {
+        await removeTrackedWallet(trackedWallet.wallet_address);
+        removeWallet();
+      }
+    } catch (error) {
+      console.error("Failed to remove tracked wallet", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,9 +117,7 @@ export const TrackedWalletCard = () => {
                   <Button onClick={handleTrackWallet}>Track New Wallet</Button>
                   <Button
                     variant="destructive"
-                    onClick={() =>
-                      removeTrackedWallet(trackedWallet.wallet_address)
-                    }
+                    onClick={handleRemoveTrackedWallet}
                   >
                     Remove Tracked Wallet
                   </Button>
@@ -76,7 +133,7 @@ export const TrackedWalletCard = () => {
               placeholder="Wallet Address to Track"
             />
             <Button onClick={handleTrackWallet} className="mt-2">
-              Track Wallet
+              {isLoading ? "Loading..." : "Track Wallet"}
             </Button>
           </div>
         )}

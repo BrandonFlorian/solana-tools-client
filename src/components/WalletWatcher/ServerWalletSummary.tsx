@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { toast } from "../ui/use-toast";
 
 export const ServerWalletSummary = () => {
   const {
@@ -25,11 +24,12 @@ export const ServerWalletSummary = () => {
   } = useWalletTrackerStore();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [sellAmounts, setSellAmounts] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchTransactionHistory();
   }, [fetchTransactionHistory]);
-  console.log(serverWallet);
+
   if (!serverWallet) return null;
 
   const handleSellAmountChange = (tokenAddress: string, amount: string) => {
@@ -37,42 +37,50 @@ export const ServerWalletSummary = () => {
   };
 
   const handleSellToken = async (tokenAddress: string) => {
-    const amount = sellAmounts[tokenAddress]
-      ? parseFloat(sellAmounts[tokenAddress])
-      : undefined;
+    try {
+      setIsLoading(true);
+      const amount = sellAmounts[tokenAddress]
+        ? parseFloat(sellAmounts[tokenAddress])
+        : undefined;
 
-    // if (!amount) {
-    //   toast({
-    //     title: "Error",
-    //     description: "Please enter an amount to sell",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
-
-    const result = await sellToken({
-      dex_type: "pump_fun",
-      token_address: tokenAddress,
-      amount_tokens: amount,
-      slippage: copyTradeSettings?.max_slippage || 0.2,
-    });
-
-    if (result.success) {
-      addNotification({
-        type: "server_wallet_trade",
-        data: {
-          signature: result.signature,
-          tokenAddress: result.token_data.address,
-          tokenName: result.token_data.name,
-          tokenSymbol: result.token_data.symbol,
-          transactionType: "SELL",
-          amount: result.transaction_data.amount_tokens,
-          price:
-            result.transaction_data.amount_tokens *
-            serverWallet.tokens.find((t) => t.address === tokenAddress)!
-              .balance,
-        },
+      const result = await sellToken({
+        dex_type: "pump_fun",
+        token_address: tokenAddress,
+        amount_tokens: amount,
+        slippage: copyTradeSettings?.max_slippage || 0.2,
       });
+
+      if (result.success) {
+        addNotification({
+          type: "server_wallet_trade",
+          data: {
+            signature: result.signature,
+            tokenAddress: result.token_data.address,
+            tokenName: result.token_data.name,
+            tokenSymbol: result.token_data.symbol,
+            transactionType: "SELL",
+            amount: result.transaction_data.amount_tokens,
+            price:
+              result.transaction_data.amount_tokens *
+              serverWallet.tokens.find((t) => t.address === tokenAddress)!
+                .balance,
+          },
+        });
+      }
+    } catch (error) {
+      console.error("Failed to sell token", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const setPercentage = (tokenAddress: string, percentage: number) => {
+    const token = serverWallet.tokens.find((t) => t.address === tokenAddress);
+    if (token) {
+      const amount = (token.balance * percentage)
+        .toFixed(9)
+        .replace(/\.?0+$/, "");
+      setSellAmounts({ ...sellAmounts, [tokenAddress]: amount });
     }
   };
 
@@ -96,31 +104,50 @@ export const ServerWalletSummary = () => {
             </DialogHeader>
             <ScrollArea className="h-[60vh] pr-4">
               {serverWallet.tokens.map((token) => (
-                <div
-                  key={token.address}
-                  className="flex items-center justify-between mb-4"
-                >
-                  <div className="flex-grow">
-                    <p className="font-semibold">{token.symbol}</p>
-                    <p className="text-sm">{token.name}</p>
-                    <p>Balance: {token.balance}</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      type="number"
-                      value={sellAmounts[token.address] || ""}
-                      onChange={(e) =>
-                        handleSellAmountChange(token.address, e.target.value)
-                      }
-                      placeholder="Amount to sell"
-                      className="w-32"
-                    />
-                    <Button
-                      onClick={() => handleSellToken(token.address)}
-                      className="whitespace-nowrap"
-                    >
-                      Sell
-                    </Button>
+                <div key={token.address} className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <p className="font-semibold">{token.symbol}</p>
+                      <p className="text-sm">{token.name}</p>
+                      <p>Balance: {token.balance}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex flex-col">
+                        <Input
+                          type="number"
+                          value={sellAmounts[token.address] || ""}
+                          onChange={(e) =>
+                            handleSellAmountChange(
+                              token.address,
+                              e.target.value
+                            )
+                          }
+                          placeholder="Amount to sell"
+                          className="w-32 mb-2"
+                        />
+                        <div className="flex space-x-1">
+                          {[25, 50, 75, 100].map((percentage) => (
+                            <Button
+                              key={percentage}
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                setPercentage(token.address, percentage / 100)
+                              }
+                              className="px-1 py-0 text-xs"
+                            >
+                              {percentage}%
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => handleSellToken(token.address)}
+                        className="whitespace-nowrap h-full"
+                      >
+                        {isLoading ? "Selling..." : "Sell"}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}

@@ -42,6 +42,24 @@ const NotificationContent: React.FC<{ notification: Notification }> = ({
         {notification.data.price} SOL
       </p>
     );
+  } else if (notification.type === "tracked_wallet_change") {
+    return (
+      <p>
+        Wallet address changed from {notification.data.oldWalletAddress} to{" "}
+        {notification.data.newWalletAddress}
+      </p>
+    );
+  } else if (notification.type === "copy_trade_settings_change") {
+    return (
+      <p>
+        Copy trade settings updated:
+        {notification.data.is_enabled
+          ? "Copy Trading Enabled"
+          : "Copy Trading Disabled"}
+        ,{notification.data.trade_amount_sol} SOL,{" "}
+        {notification.data.max_slippage} max slippage
+      </p>
+    );
   } else {
     return <p>Unknown notification type</p>;
   }

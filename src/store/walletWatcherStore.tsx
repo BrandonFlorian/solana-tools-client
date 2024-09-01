@@ -70,8 +70,6 @@ export interface BuyTransactionResponse {
 
 export interface TrackedWallet {
   id: string;
-  is_active: boolean;
-  user_id: string;
   wallet_address: string;
 }
 
@@ -120,7 +118,9 @@ export type NotificationType =
   | "copy_trade_execution"
   | "tracked_wallet_trade"
   | "server_wallet_trade"
-  | "transaction_logged";
+  | "transaction_logged"
+  | "tracked_wallet_change"
+  | "copy_trade_settings_change";
 
 export interface BaseNotification {
   type: NotificationType;
@@ -170,17 +170,54 @@ export interface TransactionLoggedNotification extends BaseNotification {
   };
 }
 
+export interface TrackedWalletChangeNotification extends BaseNotification {
+  type: "tracked_wallet_change";
+  data: {
+    oldWalletAddress: string;
+    newWalletAddress: string;
+  };
+}
+
+export interface CopyTradeSettingsNotification extends BaseNotification {
+  type: "copy_trade_settings_change";
+  data: CopyTradeSettings;
+}
+
 export type Notification =
   | TradeNotification
   | ServerWalletTradeNotification
-  | TransactionLoggedNotification;
+  | TransactionLoggedNotification
+  | TrackedWalletChangeNotification
+  | CopyTradeSettingsNotification;
 
 export interface UpdateTrackedWalletPayload {
+  tracked_wallet_id: string;
   old_wallet_address: string;
   new_wallet_address: string;
-  is_active: boolean;
 }
 
+export interface UpdateTrackedWalletResponse {
+  success: boolean;
+  new_tracked_wallet_id: string;
+}
+
+export interface UpdateCopyTradeSettingsResponse {
+  success: boolean;
+  settings_id: string;
+}
+
+export interface FetchTrackedWalletResponse {
+  tracked_wallets: TrackedWalletResponse[];
+}
+
+export interface TrackedWalletResponse {
+  id: string;
+  wallet_address: string;
+  is_active: boolean;
+  user_id: string;
+  created_at: string;
+  updated_at: string;
+}
 interface WalletTrackerState {
   trackedWallet: TrackedWallet | null;
   serverWallet: ServerWalletInfo | null;
@@ -202,9 +239,13 @@ interface WalletTrackerState {
   fetchTransactionHistory: () => void;
   addTrackedWallet: (address: string) => Promise<void>;
   removeTrackedWallet: (address: string) => Promise<void>;
-  updateTrackedWallet: (address: string, isActive: boolean) => Promise<void>;
+  updateTrackedWallet: (
+    payload: UpdateTrackedWalletPayload
+  ) => Promise<UpdateTrackedWalletResponse>;
   createCopyTradeSettings: (settings: CopyTradeSettings) => Promise<void>;
-  updateCopyTradeSettings: (settings: CopyTradeSettings) => Promise<void>;
+  updateCopyTradeSettings: (
+    settings: CopyTradeSettings
+  ) => Promise<UpdateCopyTradeSettingsResponse>;
   deleteCopyTradeSettings: (trackedWalletId: string) => Promise<void>;
   fetchCopyTradeSettings: () => void;
   buyToken: (buyRequest: BuyTokenRequest) => Promise<BuyTransactionResponse>;
@@ -258,6 +299,14 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
       const convertedNotification: TransactionLoggedNotification =
         notification as TransactionLoggedNotification;
       toastMessage = `${convertedNotification.data.transactionType} ${convertedNotification.data.amount} tokens for ${convertedNotification.data.price} SOL`;
+    } else if (notification.type === "tracked_wallet_change") {
+      const convertedNotification: TrackedWalletChangeNotification =
+        notification as TrackedWalletChangeNotification;
+      toastMessage = `Wallet address changed from ${convertedNotification.data.oldWalletAddress} to ${convertedNotification.data.newWalletAddress}`;
+    } else if (notification.type === "copy_trade_settings_change") {
+      const convertedNotification: CopyTradeSettingsNotification =
+        notification as CopyTradeSettingsNotification;
+      toastMessage = `Copy trade settings updated for tracked wallet ${convertedNotification.data.tracked_wallet_id}`;
     }
 
     toast({
@@ -276,8 +325,6 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
     set({
       trackedWallet: {
         id: wallet.id,
-        is_active: wallet.is_active,
-        user_id: wallet.user_id,
         wallet_address: wallet.wallet_address,
       },
     });
@@ -344,17 +391,23 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
     }
   },
 
-  updateTrackedWallet: async (address: string, isActive: boolean) => {
+  updateTrackedWallet: async (
+    payload: UpdateTrackedWalletPayload
+  ): Promise<UpdateTrackedWalletResponse> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/tracked_wallets`, {
+      const response = await fetch(`${API_BASE_URL}/tracked_wallets/update`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet_address: address, is_active: isActive }),
+        body: JSON.stringify({ ...payload }),
       });
       if (!response.ok) throw new Error("Failed to update tracked wallet");
       return await response.json();
     } catch (error) {
       console.error("Error updating tracked wallet:", error);
+      return {
+        success: false,
+        new_tracked_wallet_id: payload.tracked_wallet_id,
+      };
     }
   },
 
@@ -362,9 +415,12 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
     try {
       const response = await fetch(`${API_BASE_URL}/tracked_wallets`);
       if (!response.ok) throw new Error("Failed to fetch tracked wallets");
-      const data = await response.json();
+      const data: FetchTrackedWalletResponse = await response.json();
       set((state) => ({
-        trackedWallet: data.tracked_wallets[0] || null, // Assuming we're only tracking one wallet
+        //need to get the wallet from the array of wallets where is_active is true and set it to the trackedWallet. If there is no wallet, set it to null
+        trackedWallet: data.tracked_wallets.find((wallet) => wallet.is_active)
+          ? data.tracked_wallets.find((wallet) => wallet.is_active)
+          : null,
       }));
     } catch (error) {
       console.error("Error fetching tracked wallets:", error);
@@ -397,7 +453,9 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
     }
   },
 
-  updateCopyTradeSettings: async (settings: CopyTradeSettings) => {
+  updateCopyTradeSettings: async (
+    settings: CopyTradeSettings
+  ): Promise<UpdateCopyTradeSettingsResponse> => {
     try {
       const response = await fetch(`${API_BASE_URL}/copy_trade_settings`, {
         method: "PUT",
@@ -406,9 +464,14 @@ export const useWalletTrackerStore = create<WalletTrackerState>((set) => ({
       });
       if (!response.ok) throw new Error("Failed to update copy trade settings");
       set({ copyTradeSettings: settings });
+      const data: UpdateCopyTradeSettingsResponse = await response.json();
       return await response.json();
     } catch (error) {
       console.error("Error updating copy trade settings:", error);
+      return {
+        success: false,
+        settings_id: "",
+      };
     }
   },
 
