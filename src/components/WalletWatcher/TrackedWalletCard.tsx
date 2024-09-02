@@ -31,8 +31,8 @@ export const TrackedWalletCard = () => {
 
   const handleTrackWallet = async () => {
     try {
+      setIsLoading(true);
       if (newWalletAddress) {
-        setIsLoading(true);
         if (trackedWallet) {
           const payload = {
             tracked_wallet_id: trackedWallet.id,
@@ -114,7 +114,9 @@ export const TrackedWalletCard = () => {
                     onChange={(e) => setNewWalletAddress(e.target.value)}
                     placeholder="New Wallet Address"
                   />
-                  <Button onClick={handleTrackWallet}>Track New Wallet</Button>
+                  <Button onClick={handleTrackWallet}>
+                    {isLoading ? "Loading..." : "Track New Wallet"}
+                  </Button>
                   <Button
                     variant="destructive"
                     onClick={handleRemoveTrackedWallet}

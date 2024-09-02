@@ -24,7 +24,9 @@ export const ServerWalletSummary = () => {
   } = useWalletTrackerStore();
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [sellAmounts, setSellAmounts] = useState<{ [key: string]: string }>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingTokens, setLoadingTokens] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   useEffect(() => {
     fetchTransactionHistory();
@@ -38,7 +40,7 @@ export const ServerWalletSummary = () => {
 
   const handleSellToken = async (tokenAddress: string) => {
     try {
-      setIsLoading(true);
+      setLoadingTokens((prev) => ({ ...prev, [tokenAddress]: true }));
       const amount = sellAmounts[tokenAddress]
         ? parseFloat(sellAmounts[tokenAddress])
         : undefined;
@@ -51,6 +53,14 @@ export const ServerWalletSummary = () => {
       });
 
       if (result.success) {
+        const token = serverWallet.tokens.find(
+          (t) => t.address === tokenAddress
+        );
+        const amountSold = amount || token?.balance || 0;
+        const priceSol =
+          result.transaction_data.amount_tokens *
+          serverWallet.tokens.find((t) => t.address === tokenAddress)!.balance;
+
         addNotification({
           type: "server_wallet_trade",
           data: {
@@ -59,18 +69,15 @@ export const ServerWalletSummary = () => {
             tokenName: result.token_data.name,
             tokenSymbol: result.token_data.symbol,
             transactionType: "SELL",
-            amount: result.transaction_data.amount_tokens,
-            price:
-              result.transaction_data.amount_tokens *
-              serverWallet.tokens.find((t) => t.address === tokenAddress)!
-                .balance,
+            amount: amountSold,
+            price: priceSol,
           },
         });
       }
     } catch (error) {
       console.error("Failed to sell token", error);
     } finally {
-      setIsLoading(false);
+      setLoadingTokens((prev) => ({ ...prev, [tokenAddress]: false }));
     }
   };
 
@@ -80,7 +87,7 @@ export const ServerWalletSummary = () => {
       const amount = (token.balance * percentage)
         .toFixed(9)
         .replace(/\.?0+$/, "");
-      setSellAmounts({ ...sellAmounts, [tokenAddress]: amount });
+      setSellAmounts((prev) => ({ ...prev, [tokenAddress]: amount }));
     }
   };
 
@@ -144,8 +151,9 @@ export const ServerWalletSummary = () => {
                       <Button
                         onClick={() => handleSellToken(token.address)}
                         className="whitespace-nowrap h-full"
+                        disabled={loadingTokens[token.address]}
                       >
-                        {isLoading ? "Selling..." : "Sell"}
+                        {loadingTokens[token.address] ? "Selling..." : "Sell"}
                       </Button>
                     </div>
                   </div>
