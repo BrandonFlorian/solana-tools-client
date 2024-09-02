@@ -19,7 +19,7 @@ const inputVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-primary text-primary-foreground",
+        default: "border-primary",
         primary:
           "border-blue-400 ring-offset-blue-400 placeholder-blue-400 focus-visible:ring-blue-300",
         destructive:

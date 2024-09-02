@@ -2,8 +2,68 @@
 "use client";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useWalletTrackerStore } from "@/store/walletWatcherStore";
+import {
+  useWalletTrackerStore,
+  Notification,
+} from "@/store/walletWatcherStore";
 import { Avatar, AvatarImage } from "../ui/avatar";
+
+const NotificationContent: React.FC<{ notification: Notification }> = ({
+  notification,
+}) => {
+  if (
+    notification.type === "copy_trade_execution" ||
+    notification.type === "tracked_wallet_trade"
+  ) {
+    return (
+      <>
+        <Avatar>
+          <AvatarImage src={notification.data.tokenImageUri} />
+        </Avatar>
+        <p>
+          {notification.data.transactionType} {notification.data.amountToken}{" "}
+          {notification.data.tokenSymbol}
+          at {notification.data.amountSol} SOL
+        </p>
+      </>
+    );
+  } else if (notification.type === "server_wallet_trade") {
+    return (
+      <p>
+        {notification.data.transactionType} {notification.data.amount}{" "}
+        {notification.data.tokenSymbol}
+        at {notification.data.price} SOL
+      </p>
+    );
+  } else if (notification.type === "transaction_logged") {
+    return (
+      <p>
+        {notification.data.transactionType} {notification.data.amount} tokens at{" "}
+        {notification.data.price} SOL
+      </p>
+    );
+  } else if (notification.type === "tracked_wallet_change") {
+    return (
+      <p>
+        Wallet address changed from {notification.data.oldWalletAddress} to{" "}
+        {notification.data.newWalletAddress}
+      </p>
+    );
+  } else if (notification.type === "copy_trade_settings_change") {
+    return (
+      <p>
+        Copy trade settings updated:
+        {notification.data.is_enabled
+          ? "Copy Trading Enabled"
+          : "Copy Trading Disabled"}
+        ,{notification.data.trade_amount_sol} SOL,{" "}
+        {notification.data.max_slippage} max slippage
+      </p>
+    );
+  } else {
+    return <p>Unknown notification type</p>;
+  }
+};
 
 export const NotificationList: React.FC = () => {
   const { notifications } = useWalletTrackerStore();
@@ -22,20 +82,12 @@ export const NotificationList: React.FC = () => {
               <li key={index}>
                 <Card>
                   <CardHeader>
-                    <CardTitle>
-                      {notification.type}: {notification.data.transactionType}
-                    </CardTitle>
+                    <CardTitle>{notification.type}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {/* <Avatar>
-                      <AvatarImage
-                        src={notification.transaction_data.tokenImageUri}
-                      />
-                    </Avatar> */}
-                    <p>
-                      {notification.data.amountToken}
-                      {notification.data.tokenSymbol} at{" "}
-                      {notification.data.amountSol} SOL
+                    <NotificationContent notification={notification} />
+                    <p className="text-sm text-gray-500">
+                      {new Date(notification.timestamp).toLocaleString()}
                     </p>
                   </CardContent>
                 </Card>
